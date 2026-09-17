@@ -24,6 +24,24 @@ sudo apt install -y neovim git gcc make curl unzip tar ripgrep fd-find tree-sitt
   nodejs npm golang-go python3 python3-venv python3-pip lazygit xclip
 ```
 
+## System-Pakete (macOS / Homebrew)
+
+Getestet auf macOS 27 (arm64) mit Neovim 0.12.5.
+
+```bash
+brew install neovim git make curl ripgrep fd tree-sitter-cli node go python3 lazygit
+brew install --cask font-jetbrains-mono-nerd-font
+```
+
+| Abweichung zu apt | Grund |
+|---|---|
+| `tree-sitter-cli` statt `tree-sitter` | Die Formel `tree-sitter` enthält nur die Library, nicht das CLI-Binary |
+| `fd` statt `fd-find` | Binary heißt auf Homebrew direkt `fd` |
+| `node` statt `nodejs`/`npm` | npm ist in der Node-Formel enthalten |
+| `go` statt `golang-go` | – |
+| kein `xclip` / `gcc` | Zwischenablage über `pbcopy`, Compiler über Xcode Command Line Tools (`xcode-select --install`) |
+| Schrift als Cask | landet in `~/Library/Fonts`, kein `fc-cache` nötig |
+
 ## Rust (rustup, ohne sudo)
 
 | Komponente | Wofür |

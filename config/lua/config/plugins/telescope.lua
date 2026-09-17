@@ -24,6 +24,7 @@ return {
     { "<leader>fo", function() require("telescope.builtin").lsp_document_symbols() end, desc = "Symbole in Datei" },
     { "<leader>fO", function() require("telescope.builtin").lsp_dynamic_workspace_symbols() end, desc = "Symbole im Projekt" },
     { "<leader>f.", function() require("telescope.builtin").resume() end, desc = "Letzte Suche fortsetzen" },
+    { "<leader>fp", function() require("telescope.builtin").pickers() end, desc = "Frühere Suchen (Historie)" },
     { "<leader>/", function() require("telescope.builtin").current_buffer_fuzzy_find() end, desc = "In Datei suchen" },
     { "<leader><leader>", function() require("telescope.builtin").buffers({ sort_mru = true, ignore_current_buffer = true }) end, desc = "Buffer wechseln" },
     { "<leader>fn", function() require("telescope.builtin").find_files({ cwd = vim.fn.stdpath("config") }) end, desc = "Neovim-Config" },
@@ -37,6 +38,9 @@ return {
         sorting_strategy = "ascending",
         layout_config = { prompt_position = "top" },
         file_ignore_patterns = { "^.git/", "node_modules/", "target/" },
+        -- Standard ist 1: nur die letzte Suche ist über <leader>f. wiederholbar.
+        -- 10 gemerkte Picker -> <leader>fp zeigt sie mit Suchbegriff zur Auswahl.
+        cache_picker = { num_pickers = 10 },
         mappings = {
           -- Ctrl-q: Treffer in die Quickfix-Liste (dann äq / öq zum Durchgehen)
           i = { ["<C-q>"] = actions.smart_send_to_qflist + actions.open_qflist },

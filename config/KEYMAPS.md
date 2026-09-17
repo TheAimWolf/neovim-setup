@@ -34,7 +34,8 @@
 | `<leader>fo` / `<leader>fO` | Symbole Datei / Projekt |
 | `<leader>fd` | Diagnostics |
 | `<leader>fh` / `<leader>fk` | Hilfe / Keymaps |
-| `<leader>f.` | Letzte Suche fortsetzen |
+| `<leader>f.` | Letzte Suche fortsetzen (mit Suchbegriff und Treffern) |
+| `<leader>fp` | Frühere Suchen: Liste der letzten 10 Picker, Auswahl setzt sie fort |
 | `<leader>fn` | Neovim-Config-Dateien |
 | im Picker: `Ctrl-q` | Treffer → Quickfix-Liste |
 
@@ -67,6 +68,7 @@
 | `ys{motion}{z}` / `cs{alt}{neu}` / `ds{z}` | Surround: z.B. `ysiw"`, `cs"'`, `ds(` |
 | `<leader>u` | Undotree |
 | `<leader>n` | Zeilennummern relativ ↔ absolut |
+| `<leader>tb` | Hintergrund: transparent (Terminal) ↔ rose-pine |
 | `<leader>w` / `<leader>q` | Speichern / Fenster schließen |
 | `<leader>x` | `chmod +x` |
 | `Esc` | Suchmarkierung aus |
@@ -74,7 +76,7 @@
 ## Git
 | Taste | Wirkung |
 |---|---|
-| `<leader>gg` | lazygit |
+| `<leader>gg` | lazygit (im Repo der aktuellen Datei / des Explorer-Ordners) |
 | `<leader>gs` | fugitive Status (`s` stage, `u` unstage, `cc` commit, `=` diff) |
 | `<leader>gb` / `<leader>gd` / `<leader>gl` | Blame / Diff / Log |
 | `äc` / `öc` | Nächster / voriger Hunk |

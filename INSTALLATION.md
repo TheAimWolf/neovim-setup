@@ -50,6 +50,31 @@ Danach weiter bei **„Nach der Installation“**.
 
 ---
 
+## Variante A2: Automatisch (macOS mit Homebrew)
+
+Dasselbe Skript funktioniert auf macOS – es erkennt das System per `uname` und nutzt Homebrew statt apt.
+
+```bash
+# Homebrew, falls noch nicht vorhanden:
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+git clone https://github.com/TheAimWolf/neovim-setup.git ~/neovim-setup
+bash ~/neovim-setup/install.sh
+```
+
+Unterschiede zur Linux-Variante:
+
+| Schritt | macOS |
+|---|---|
+| Pakete | `brew install …` (kein sudo); Compiler kommt von den Xcode Command Line Tools |
+| tree-sitter | Formel heißt **`tree-sitter-cli`** – `tree-sitter` allein ist nur die Library, ohne Binary |
+| Schrift | `brew install --cask font-jetbrains-mono-nerd-font` (nach `~/Library/Fonts`, kein `fc-cache`) |
+| Zwischenablage | `pbcopy`/`pbpaste` sind eingebaut, `xclip` entfällt |
+| Terminal | Konsole-Profil ist irrelevant; Schrift in Terminal.app / iTerm2 / Ghostty o.ä. einstellen |
+
+Alles andere (Symlink, Plugins, Mason, Parser) läuft identisch.
+
+---
+
 ## Variante B: Manuell
 
 ### 1. System-Pakete
@@ -124,6 +149,17 @@ nvim --headless "+Lazy! restore" +qa     # Plugins auf die Versionen aus lazy-lo
 
 Plugins aktualisieren: in nvim `:Lazy update` → `lazy-lock.json` ändert sich → committen & pushen.
 
+### Config in einer laufenden Session neu laden
+
+| Befehl | Wirkung |
+|---|---|
+| `:ReloadConfig` | lädt `options.lua`, `keymaps.lua`, `autocmds.lua` neu |
+| `:ReloadConfig <Plugin>` | liest die Plugin-Specs neu ein und führt `config()` des Plugins erneut aus, z.B. `:ReloadConfig rose-pine` (Tab vervollständigt) |
+| `:Lazy reload <Plugin>` | dasselbe direkt über lazy.nvim (ohne Spec-Reparse) |
+
+Nicht neu ladbar: `init.lua` selbst, gelöschte Keymaps/Autocmds (die bleiben bis zum Neustart aktiv)
+und Plugins, die beim Laden globale Zustände anlegen. Bei Zweifeln: `nvim` neu starten.
+
 ---
 
 ## Probleme & Lösungen
@@ -131,10 +167,11 @@ Plugins aktualisieren: in nvim `:Lazy update` → `lazy-lock.json` ändert sich 
 | Problem | Lösung |
 |---|---|
 | **Neovim ist zu alt** (apt liefert < 0.12, z.B. Ubuntu LTS / Debian stable) | Offizielles Release nutzen: `curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz && sudo tar -C /opt -xzf nvim-linux-x86_64.tar.gz && sudo ln -sf /opt/nvim-linux-x86_64/bin/nvim /usr/local/bin/nvim` |
-| `tree-sitter-cli` nicht in apt | `cargo install --locked tree-sitter-cli` (nicht über npm!) |
+| `tree-sitter-cli` nicht in apt | `cargo install --locked tree-sitter-cli` (nicht über npm!). macOS: `brew install tree-sitter-cli` |
+| **macOS:** `tree-sitter: command not found`, obwohl `brew list` `tree-sitter` zeigt | Die Formel `tree-sitter` ist nur die Library. CLI: `brew install tree-sitter-cli` |
 | `gitcommit`-Parser: *„parser.so not found after build attempt“* | nvim-treesitter bricht Builds nach 60 s ab. `install.sh` erneut ausführen – es baut den Parser dann manuell. |
 | Icons sind Kästchen / Fragezeichen | Terminal-Schrift nicht umgestellt oder Terminal nicht neu gestartet. |
-| Lua-Dateien: *„Parser could not be created … language lua“* | Wird in `lua/config/lazy.lua` über `performance.rtp.paths = { "/usr/lib/nvim" }` gelöst (Debian legt eingebaute Parser dort ab). Auf anderen Distros ist der Eintrag harmlos. |
+| Lua-Dateien: *„Parser could not be created … language lua“* | Debian legt eingebaute Parser in `/usr/lib/nvim` ab; `lua/config/lazy.lua` hängt den Pfad an die rtp, **falls er existiert** (auf macOS/anderen Distros also automatisch aus). |
 | `ts_ls`/`pyright`/`gopls` fehlen | Node bzw. Go war bei der Installation nicht da → nachinstallieren, dann in nvim `:Mason` → Paket mit `i` installieren. |
 | rust-analyzer startet nicht | `rustup component add rust-analyzer rust-src`; Projekt muss eine `Cargo.toml` haben. |
 | Zwischenablage geht nicht | X11: `xclip`, Wayland: `sudo apt install wl-clipboard`. |

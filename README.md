@@ -2,7 +2,7 @@
 
 Meine Neovim-Konfiguration – schlank, selbst zusammengestellt, im Stil von ThePrimeagen, angepasst an eine **QWERTZ**-Tastatur.
 
-- **Theme:** rose-pine
+- **Theme:** rose-pine (transparent, also Terminal-Hintergrund; `<leader>tb` schaltet um)
 - **LSP:** Rust, Lua, JavaScript/TypeScript, Python, Go (über Mason bzw. rustup)
 - **Navigation:** Harpoon 2, Telescope (ripgrep/fd), oil.nvim
 - **Editor:** Treesitter, blink.cmp, conform.nvim (Format beim Speichern), autopairs, surround, which-key
@@ -18,6 +18,15 @@ sudo apt install -y git
 git clone https://github.com/TheAimWolf/neovim-setup.git ~/neovim-setup
 bash ~/neovim-setup/install.sh
 ```
+
+## Schnellstart (macOS, Homebrew)
+
+```bash
+git clone https://github.com/TheAimWolf/neovim-setup.git ~/neovim-setup
+bash ~/neovim-setup/install.sh
+```
+
+Dasselbe Skript – es erkennt macOS und installiert per `brew` (Details in [INSTALLATION.md](INSTALLATION.md)).
 
 Danach im Terminal die Schrift **JetBrainsMono Nerd Font Mono** einstellen und `nvim` starten.
 
@@ -50,7 +59,7 @@ config/                     → ~/.config/nvim
 ├── init.lua
 ├── lazy-lock.json
 └── lua/config/
-    ├── options.lua  keymaps.lua  autocmds.lua  lazy.lua
+    ├── options.lua  keymaps.lua  autocmds.lua  commands.lua  lazy.lua
     └── plugins/     colorscheme, telescope, harpoon, treesitter, lsp,
                      completion, format, git, oil, editor
 install.sh                  → Einrichtung auf einem neuen Rechner

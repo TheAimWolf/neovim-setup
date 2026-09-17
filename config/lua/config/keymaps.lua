@@ -62,9 +62,33 @@ end, { desc = "Undotree" })
 -- Terminal: Esc Esc verlässt den Terminal-Mode
 map("t", "<Esc><Esc>", [[<C-\><C-n>]])
 
--- lazygit in eigenem Tab
+-- Ordner des aktuellen Buffers: im Explorer der angezeigte Ordner,
+-- bei einer Datei deren Verzeichnis, sonst das Arbeitsverzeichnis
+local function buf_dir()
+  local buf = vim.api.nvim_get_current_buf()
+  if vim.bo[buf].filetype == "oil" then
+    local ok, oil = pcall(require, "oil")
+    local dir = ok and oil.get_current_dir(buf)
+    if dir then return dir end
+  end
+  local name = vim.api.nvim_buf_get_name(buf)
+  if name ~= "" and vim.bo[buf].buftype == "" then
+    return vim.fs.dirname(name)
+  end
+  return assert(vim.uv.cwd())
+end
+
+-- lazygit in eigenem Tab, im Git-Repo des aktuellen Buffers
 map("n", "<leader>gg", function()
-  vim.cmd("tabnew | terminal lazygit")
+  local dir = buf_dir()
+  local root = vim.fs.root(dir, ".git")
+  if not root then
+    vim.notify("Kein Git-Repo für " .. dir, vim.log.levels.WARN)
+    return
+  end
+  vim.cmd("tabnew")
+  vim.cmd("tcd " .. vim.fn.fnameescape(root))
+  vim.cmd("terminal lazygit")
   local buf = vim.api.nvim_get_current_buf()
   vim.bo[buf].bufhidden = "wipe"
   vim.api.nvim_create_autocmd("TermClose", {
@@ -79,4 +103,4 @@ map("n", "<leader>gg", function()
     end,
   })
   vim.cmd.startinsert()
-end, { desc = "lazygit" })
+end, { desc = "lazygit (Repo des Buffers)" })

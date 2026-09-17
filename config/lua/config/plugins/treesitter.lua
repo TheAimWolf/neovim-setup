@@ -18,7 +18,9 @@ return {
       -- Headless (Skripte) nicht automatisch bauen, sonst brechen Builds beim Beenden ab
       if not headless then ts.install(parsers) end
     elseif not headless then
-      vim.notify("tree-sitter-cli fehlt: sudo apt install tree-sitter-cli", vim.log.levels.WARN)
+      local hint = vim.fn.has("mac") == 1 and "brew install tree-sitter-cli"
+        or "sudo apt install tree-sitter-cli"
+      vim.notify("tree-sitter-cli fehlt: " .. hint, vim.log.levels.WARN)
     end
 
     vim.api.nvim_create_autocmd("FileType", {

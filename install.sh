@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# neovim-setup installieren (Debian / Ubuntu / Kali)
+# neovim-setup installieren (Debian / Ubuntu / Kali sowie macOS mit Homebrew)
 # Aufruf:  bash install.sh   (aus dem Git-Klon oder vom USB-Stick)
 set -euo pipefail
 
@@ -10,15 +10,33 @@ DATA_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/nvim"
 step() { printf '\n\033[1;35m==> %s\033[0m\n' "$*"; }
 warn() { printf '\033[1;33m!!  %s\033[0m\n' "$*"; }
 
+case "$(uname -s)" in
+  Darwin) OS=macos ;;
+  *)      OS=linux ;;
+esac
+
 # ---------------------------------------------------------------------------
-step "1/7 System-Pakete (sudo)"
-if command -v apt >/dev/null; then
+step "1/7 System-Pakete"
+if [ "$OS" = macos ]; then
+  if command -v brew >/dev/null; then
+    # tree-sitter-cli = CLI-Binary (die Formel "tree-sitter" ist nur die Library)
+    brew install neovim git make curl ripgrep fd tree-sitter-cli node go python3 lazygit
+    # git/curl/make/python3 liefert macOS zwar mit, Homebrew-Versionen sind aber
+    # neuer; Compiler kommt von den Xcode Command Line Tools:
+    xcode-select -p >/dev/null 2>&1 || xcode-select --install || true
+  else
+    warn "Homebrew fehlt. Installieren mit:"
+    warn '  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
+    warn "und danach dieses Skript erneut starten."
+    exit 1
+  fi
+elif command -v apt >/dev/null; then
   sudo apt update
   sudo apt install -y neovim git gcc make curl unzip tar ripgrep fd-find \
     tree-sitter-cli nodejs npm golang-go python3 python3-venv python3-pip \
     lazygit xclip
 else
-  warn "Kein apt gefunden – Pakete aus ABHAENGIGKEITEN.md bitte manuell installieren."
+  warn "Kein apt/brew gefunden – Pakete aus ABHAENGIGKEITEN.md bitte manuell installieren."
 fi
 
 # ---------------------------------------------------------------------------
@@ -47,17 +65,26 @@ fi
 
 # ---------------------------------------------------------------------------
 step "4/7 JetBrainsMono Nerd Font"
-FONT_DIR="$HOME/.local/share/fonts/JetBrainsMonoNerd"
-if fc-list | grep -q "JetBrainsMono Nerd Font Mono"; then
-  echo "Schrift bereits installiert"
+if [ "$OS" = macos ]; then
+  if ls ~/Library/Fonts /Library/Fonts 2>/dev/null | grep -qi "JetBrainsMonoNerdFont"; then
+    echo "Schrift bereits installiert"
+  else
+    brew install --cask font-jetbrains-mono-nerd-font
+    echo "Schrift installiert"
+  fi
 else
-  mkdir -p "$FONT_DIR"
-  curl -fsSL -o "$FONT_DIR/f.tar.xz" \
-    https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.tar.xz
-  tar -xf "$FONT_DIR/f.tar.xz" -C "$FONT_DIR"
-  rm "$FONT_DIR/f.tar.xz"
-  fc-cache -f >/dev/null
-  echo "Schrift installiert"
+  FONT_DIR="$HOME/.local/share/fonts/JetBrainsMonoNerd"
+  if fc-list | grep -q "JetBrainsMono Nerd Font Mono"; then
+    echo "Schrift bereits installiert"
+  else
+    mkdir -p "$FONT_DIR"
+    curl -fsSL -o "$FONT_DIR/f.tar.xz" \
+      https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.tar.xz
+    tar -xf "$FONT_DIR/f.tar.xz" -C "$FONT_DIR"
+    rm "$FONT_DIR/f.tar.xz"
+    fc-cache -f >/dev/null
+    echo "Schrift installiert"
+  fi
 fi
 
 # ---------------------------------------------------------------------------
@@ -117,6 +144,16 @@ fi
 
 # ---------------------------------------------------------------------------
 step "Fertig!"
+if [ "$OS" = macos ]; then
+cat <<EOF
+Noch zu tun:
+  1. Im Terminal die Schrift "JetBrainsMono Nerd Font Mono" einstellen
+     (Terminal.app: Einstellungen > Profile > Schrift,
+      iTerm2/Ghostty/WezTerm: font family in der jeweiligen Config).
+  2. nvim starten und :checkhealth ausführen.
+  3. Tastenbelegung: ~/.config/nvim/KEYMAPS.md  (in nvim: <Leertaste>fn)
+EOF
+else
 cat <<EOF
 Noch zu tun:
   1. Im Terminal die Schrift "JetBrainsMono Nerd Font Mono" einstellen
@@ -125,3 +162,4 @@ Noch zu tun:
   2. nvim starten und :checkhealth ausführen.
   3. Tastenbelegung: ~/.config/nvim/KEYMAPS.md  (in nvim: <Leertaste>fn)
 EOF
+fi
